@@ -245,7 +245,7 @@ findmnt                                          # Lists currently mounted files
 fdisk [-l] /dev/<sdX>                            # Manages partitions (`-l`: list tables; run without flags for interactive editor)
 parted -s /dev/<sdX> mklabel gpt                 # [#parted] Non-interactively creates a fresh GPT partition table on a disk
 parted -s /dev/<sdX> mkpart primary <fs> 0% 100% # [#parted] Non-interactively creates a single partition spanning the entire disk
-mkfs.<ext4|btrfs|vfat|xfs> /dev/<sdX1>           # Formats a partition with a specified filesystem type (ext4, btrfs, vfat/FAT32, xfs)
+mkfs.<ext4|btrfs|vfat|xfs> [-f|-L <label>] <dev> # Formats a partition with a filesystem (`-f`: force overwrite; `-L`: volume label; supports ext4, btrfs, vfat, xfs and more)
 mkswap <dev_or_file>                             # Sets up a Linux swap area on a partition or a pre-allocated file
 swapon <dev_or_file>                             # Activates a designated swap partition or file so the kernel can use it for virtual memory
 smartctl -a /dev/<sdX>                           # [#smartmontools] Displays detailed SMART health status, temperature, and diagnostics for a drive
