@@ -150,6 +150,17 @@ pacman -Q [-qe|-qt|-qi]                          # Queries installed packages (`
 sudo pacman -Sc                                  # Removes old, uninstalled package files from the local cache to free up disk space
 sudo pacman -Scc                                 # Deletes all cached package files from local storage entirely to maximize free disk space
 
+# === PACKAGE MANAGEMENT: FLATPAK ===
+flatpak search <term>                            # [#flatpak] Searches configured remote repositories for applications matching a specific keyword
+flatpak install <app>                            # [#flatpak] Downloads and installs an application or runtime from a configured remote repository (like Flathub)
+flatpak uninstall <app>                          # [#flatpak] Removes an installed Flatpak application or runtime from the system
+flatpak uninstall --unused                       # [#flatpak] Cleans up and removes orphaned runtimes and extensions not used by any installed app
+flatpak update                                   # [#flatpak] Updates all installed Flatpak applications and runtimes to their latest versions
+flatpak list [--app]                             # [#flatpak] Lists installed packages (`--app`: only show installed GUI applications, ignoring runtimes)
+flatpak run <app_id>                             # [#flatpak] Launches a Flatpak application using its full reverse-DNS identifier (e.g., org.gimp.GIMP)
+flatpak remotes                                  # [#flatpak] Lists all configured remote repositories where applications and runtimes are fetched from
+flatpak override <app_id>                        # [#flatpak] Modifies sandbox permissions for a specific app (consider using Flatseal for a GUI alternative)
+
 # === AUR HELPERS (YAY / PARU) ===
 # NOTE: The AUR can have dangerous scripts, try to only install from official repositories pretty please :3
 paru -Syu                                        # [#yay or paru] Updates all official repository packages as well as installed AUR packages
@@ -269,12 +280,20 @@ ctop                                             # [#ctop] A top-like terminal i
 
 # === KDE PLASMA ENVIRONMENT & UTILITIES ===
 kstart5 / kstart                                 # Launches an application with specific startup window properties
+yakuake                                          # [#yakuake] A drop-down terminal emulator for KDE Plasma (press F12 to toggle)
 qdbus                                            # Queries and calls D-Bus interfaces to interact with running KDE Plasma applications and system services
 kquitapp5 <service>                              # Requests a KDE application or daemon to close via D-Bus
 kscreen-console                                  # Diagnostic utility for inspecting KDE screen layouts, outputs, and connector statuses
 plasmoidviewer                                   # Testbed utility to run and debug individual KDE Plasma widgets outside of the desktop shell
 kde-open5 <url_or_file>                          # Opens a file or URL using the user's default KDE desktop application handlers
 kwriteconfig5 --file <cfg> --group <g>...        # Reads or writes entries into KDE configuration files directly from the command line
+plasmashell --replace &                          # Restarts the KDE Plasma desktop shell in the background (useful if the panel or desktop freezes)
+kbuildsycoca5 / kbuildsycoca6                    # Rebuilds the KDE system configuration cache (fixes missing app icons or broken application menus)
+kdialog --msgbox "<text>"                        # Displays native KDE Plasma graphical dialog boxes and prompts from shell scripts or the terminal
+kdeconnect-cli -l                                # [#kdeconnect] Lists all paired and available mobile devices on the local network via KDE Connect
+kdeconnect-cli --ring <id>                       # [#kdeconnect] Rings a specific paired mobile device at full volume (useful for finding a misplaced phone)
+spectacle -r -b -c                               # [#spectacle] Takes a rectangular region screenshot in the background and copies it directly to the clipboard
+kinfo                                            # Displays a summary of your system information, KDE Plasma version, and Frameworks details
 
 # === DESKTOP, MEDIA & UTILITIES ===
 ffmpeg -i <in> <out>                             # [#ffmpeg] Converts, records, and streams audio and video file formats via the command line
