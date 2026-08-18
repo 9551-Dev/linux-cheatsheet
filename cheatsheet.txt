@@ -242,6 +242,7 @@ genfstab [-U|-L] <dir>                           # [#arch-install-scripts] Gener
 mount [-t <type>] [-o <opts>] <dev> <dir>        # Attaches a storage filesystem from a device to a designated directory tree path
 umount <dir>                                     # Detaches a currently mounted filesystem from the directory tree
 findmnt                                          # Lists currently mounted filesystems in an organized, searchable tree format
+dd if=<src> of=<dst> [bs=<size>] [count=<num>]   # Converts and copies files or disk images (`if`: input file; `of`: output file; `bs`: block size; `status=progress`: show transfer progress)
 
 # === DISK PARTITIONING & FORMATTING ===
 fdisk [-l] /dev/<sdX>                            # Manages partitions (`-l`: list tables; run without flags for interactive editor)
@@ -428,3 +429,12 @@ git stash                                        # [#git] Temporarily shelves un
 /etc/udev/rules.d/                               # Custom dynamic device node rules for hardware detection and configuration
 /etc/default/grub                                # Main configuration file for customizing GRUB bootloader parameters and kernel command lines
 /boot/grub/grub.cfg                              # Compiled GRUB configuration file executed at boot (generated automatically via grub-mkconfig)
+
+# === DATA & SPECIAL DEVICES ===
+/dev/zero                                        # Infinite stream source of null bytes (binary zeros) used for filling or sizing files
+/dev/null                                        # Black hole device file that discards all data written to it and returns EOF immediately on read
+/dev/urandom                                     # Cryptographically secure pseudo-random number generator device using system environmental noise
+/dev/stdin, /dev/stdout, /dev/stderr             # File descriptors representing standard input, standard output, and standard error streams respectively
+/dev/random                                      # Blocking pseudo-random number generator device that waits for entropy pool replenishment
+/dev/full                                        # Special device file that always returns a "No space left on device" error when written to
+/dev/tty                                         # Controlling terminal device file corresponding to the current active login session
