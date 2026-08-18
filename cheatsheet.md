@@ -219,23 +219,24 @@ ifconfig [-a|<dev> <up|down>]                    # [#net-tools] Legacy tool for 
 ping [-c <count>] <host>                         # Sends ICMP echo request packets to test network connectivity (`-c`: limit packet count)
 traceroute <host>                                # [#traceroute] Tracks the route packets take to reach a remote host, displaying hop delays
 tracepath <host>                                 # Traces the network path discovering MTU along the way (does not require root privileges)
-ss -tulpn                                        # Displays socket statistics, listing active listening ports and their associated processes
-netstat [-tulpn]                                 # [#net-tools] Legacy tool for network connections (`-tulpn`: active TCP/UDP listening processes)
+ss [-t|-u|-l|-a|-n|-p]                           # [#iproute2] Displays socket statistics and shows which ports a process is using (`-t`: TCP; `-u`: UDP; `-l`: listening; `-p`: processes)
+netstat [-t|-u|-l|-n|-p]                         # [#net-tools] Legacy tool showing which ports processes are using (`-t`: TCP; `-u`: UDP; `-l`: listening; `-n`: numeric; `-p`: processes)
 sudo tcpdump [-i <dev>]                          # [#tcpdump] Captures and displays real-time network packets (`-i`: specify network interface)
 nmap [-p <port>|-sV|-O|-A|-sn] <target-net>      # [#nmap] Scans a host (`-p`: specify ports; `-sV`: service versions; `-O`: OS detect; `-A`: aggressive; `-sn`: ping scan/host discovery)
-dig <domain>                                     # [#bind] Queries DNS name servers for information regarding host addresses, MX records, and zone lookups
+dig [@<server>] <domain> [<type>]                # [#bind] Queries DNS records; optionally specify a server or record type (e.g., A, AAAA, MX, TXT, CNAME)
 nslookup <domain>                                # [#bind] Queries internet name servers interactively or directly to find IP addresses
 whois <domain>                                   # [#whois] Queries the WHOIS database to retrieve domain registration and ownership information
 curl -O <url>                                    # Transfers data from or to a server, downloading a file using its remote filename
 wget [-O <file>] <url>                           # [#wget] A non-interactive network downloader for retrieving files (`-O`: save under a custom filename)
-perf3 -s [-p <port>]                             # [#iperf3] Starts a network performance server (`-p`: specify custom port)
+iperf3 -s [-p <port>]                             # [#iperf3] Starts a network performance server (`-p`: specify custom port)
 iperf3 -c <host> [-u|-R|-P <num>|-t <sec>]       # [#iperf3] Tests bandwidth against a server (`-u`: UDP; `-R`: reverse mode; `-P`: parallel streams; `-t`: duration)
 ssh [-p <port>] <user>@<host>                    # Establishes an encrypted secure shell session on a remote server (`-p`: specify custom port)
 scp [-r] <src> <user>@<host>:<dest>              # Securely copies files over an SSH network connection (`-r`: recursively copy directories)
 
 # === STORAGE, DRIVES & MOUNTING ===
 lsblk [-f]                                       # Lists information about available block storage devices (`-f`: output filesystems and UUIDs)
-blkid                                            # Prints block device attributes including filesystem types and unique identifiers (UUIDs)
+blkid [-s <tag>|-o <format>] [<dev>]             # Prints filesystem types and UUIDs of block devices (`-s`: show specific tag; `-o`: custom output format)
+genfstab [-U|-L] <dir>                           # [#arch-install-scripts] Generates a fstab file for a mounted system (`-U`: use UUIDs; `-L`: use labels)
 mount [-t <type>] [-o <opts>] <dev> <dir>        # Attaches a storage filesystem from a device to a designated directory tree path
 umount <dir>                                     # Detaches a currently mounted filesystem from the directory tree
 findmnt                                          # Lists currently mounted filesystems in an organized, searchable tree format
@@ -342,7 +343,7 @@ unzip <archive.zip>                              # [#unzip] Extracts compressed 
 7z [a|x] <archive> <target>                      # [#7zip] A high-compression archiving tool (`a`: add/compress files into an archive; `-x`: extract files)
 nano <file>                                      # Opens a terminal-based text editor for editing files (Ctrl+O to save, Enter to confirm, Ctrl+X to exit)
 vim <file>                                       # [#vim] Opens a modal keyboard-driven text editor (press "i" to insert, ESC then ":wq" to save and quit, ":q!" to quit without saving)
-rsync [-avP] <src> <dst>                         # [#rsync] Syncs and copies files locally or over a network (`-a`: archive mode; `-v`: verbose; `-P`: show progress)
+rsync [-avP] <src> [<user>@<host>:]<dst>         # [#rsync] Syncs/copies files locally or to/from a remote server (`-a`: archive; `-v`: verbose; `-P`: progress)
 exiftool <file>                                  # [#perl-image-exiftool] Reads, writes, and modifies metadata tags across a vast range of media files
 
 # === GIT & VERSION CONTROL ===
