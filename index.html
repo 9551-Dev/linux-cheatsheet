@@ -526,6 +526,7 @@
                 const search_box = document.getElementById("search_box");
                 const body_element = document.body;
                 const pre_element = code_element.closest("pre");
+                const wrapper_container = document.querySelector(".wrapper_container");
 
                 function get_match_score(query, target) {
                     if (!query) return 0;
@@ -632,6 +633,10 @@
                         }
 
                         parent.appendChild(pre_element);
+
+                        if (wrapper_container) {
+                            wrapper_container.scrollTop = 0;
+                        }
                     }, 150);
                 });
 
