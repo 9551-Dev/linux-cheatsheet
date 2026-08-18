@@ -3,9 +3,10 @@ man <command>                                    # [#man-db] Opens the official 
 tldr <command>                                   # [#tealdeer] Displays simplified examples of how to use a command
 <command> --help / -h                            # Prints a summary of a command's usage and available flags directly in the terminal
 
-# === NAVIGATION & FILES ===
+# === BASICS, NAVIGATION & FILES ===
 pwd                                              # Prints the absolute file path of the current working directory
-ls [-la|-lh|-R|--tree]                           # Lists directory contents (`-l`: long format with details; `-a`: include hidden files; `-h`: human-readable file sizes; `-R`: recursively list subdirectories)
+sudo [-u <user>|-s|-H] <command>                 # Executes a command with elevated privileges (`-u`: run as specific user; `-s`: execute shell; `-H`: set HOME to target user's home dir)
+ls [-la|-lh|-R|--tree]                           # Lists directory contents (`-l`: long format with details; `-a`: include hidden; `-h`: human-readable file sizes; `-R`: recursively list subdirectories)
 cd <dir>                                         # Changes the current working directory to the specified folder path
 cp [-r|-i] <src> <dst>                           # Copies files or directories (`-r`: recursive copy for folders; `-i`: prompt before overwriting existing files)
 mv [-i] <src> <dst>                              # Moves or renames files and directories (`-i`: prompt before overwriting existing destination files)
@@ -19,7 +20,7 @@ cat <file>                                       # Outputs the entire contents o
 less <file>                                      # Opens a file for interactive, page-by-page viewing (use arrow keys to scroll, "/" to search, press "q" to exit)
 head [-n <num>] <file>                           # Outputs the first lines of a file (defaults to 10 lines; use `-n` to specify a custom line count)
 tail [-n <num>|-f] <file>                        # Outputs the final lines of a file (`-n`: specify line count; `-f`: append output as the file grows, used for logs)
-grep [-i|-r] <term> <file>                       # Searches for text patterns matching a regular expression (`-i`: case-insensitive search; `-r`: recursive search through directories)
+grep [-i|-r|-E] <pattern> [<file>]               # Searches for text patterns matching a regular expression (`-i`: case-insensitive; `-r`: recursive directory search; `-E`: extended regular expressions)
 find <dir> -name <pattern>                       # Searches for files within a directory hierarchy based on a filename pattern
 which <command>                                  # Locates and prints the full path of the executable file associated with a given command
 file <file>                                      # Identifies the data type and format of a file, ignoring its extension
@@ -72,13 +73,13 @@ $((<expression>>)                                # Arithmetic expansion: evaluat
 [<set>]                                          # Wildcard: matches any one of the characters enclosed within the brackets (e.g., [a-z])
 
 # === TEXT PROCESSING & FILTERING ===
-awk '{print $<num>}' <file>                      # Pattern scanning and text processing language for fields and columns
-sed 's/<old>/<new>/g' <file>                     # Stream editor for filtering and transforming text (search and replace)
-cut [-d <delim>] -f <num> <file>                 # Removes sections from each line of files based on delimiters
-sort [-n|-r] <file>                              # Sorts lines of text files (`-n`: numeric sort; `-r`: reverse order)
-uniq [-c] <file>                                 # Reports or omits repeated lines in a file (`-c`: count occurrences)
-tr <set1> <set2>                                 # Translate, squeeze, or delete characters from standard input
-diff <file1> <file2>                             # Compares files line by line
+awk '{print $<num>}' <file>                      # Pattern scanning and text processing language for fields and columns (`-F`: set field separator)
+sed 's/<old>/<new>/g' <file>                     # Stream editor for filtering and transforming text (`-i`: edit files in-place; `g`: global replacement per line)
+cut [-d <delim>] -f <num> <file>                 # Removes sections from each line of files based on delimiters (`-d`: specify delimiter; `-f`: select fields)
+sort [-n|-r] <file>                              # Sorts lines of text files (`-n`: numeric sort; `-r`: reverse order; `-u`: output unique lines)
+uniq [-c] <file>                                 # Reports or omits repeated lines in a file (`-c`: count occurrences; `-d`: only print duplicate lines)
+tr <set1> <set2>                                 # Replaces, squashes, or deletes individual characters from piped input (`-d`: delete chars; `-s`: squash duplicates)
+diff <file1> <file2>                             # Compares files line by line (`-u`: output unified diff format; `-w`: ignore white space)
 
 # === TERMINAL SHORTCUTS & MOUSE BEHAVIOR ===
 Tab                                              # Auto-completes file, folder, and command names as you type
@@ -115,6 +116,7 @@ jobs                                             # Lists active background jobs 
 bg [%job]                                        # Resumes a suspended job and runs it in the background
 fg [%job]                                        # Brings a background or suspended job into the foreground
 <command> &                                      # Runs a command immediately in the background
+nohup <command> &                                # Runs a background command that ignores hangup signals and keeps running after logout
 screen / tmux                                    # [#tmux] Terminal multiplexers for running multiple persistent sessions in one window
 
 # === ALTERNATIVE CLI TOOLS ===
@@ -166,7 +168,7 @@ flatpak override <app_id>                        # [#flatpak] Modifies sandbox p
 # === AUR HELPERS (YAY / PARU) ===
 # NOTE: The AUR can have dangerous scripts, try to only install from official repositories pretty please :3
 paru -Syu                                        # [#yay or paru] Updates all official repository packages as well as installed AUR packages
-paru <pkg>                                       # [#yay or paru] Searches, downloads and installs software packages from official repositories or the AUR
+paru [--repo] <pkg>                              # [#paru] Searches, downloads and installs packages (`--repo`: restrict installation to official repositories only)
 paru -Sc                                         # [#yay or paru] Clears out old cached AUR build files and downloaded tarballs
 paru -Scc                                        # [#yay or paru] Completely wipes all cached packages, build directories, and archives
 
@@ -265,15 +267,17 @@ kill [-9] <PID>                                  # Sends a termination signal to
 killall <process_name>                           # Terminates all running processes matching a given executable name
 
 # === CODE EXECUTION & RUNTIMES ===
-python3 <script.py> [<args>]                     # [#python] Executes a Python script via the interpreter
-python -m <module>                               # [#python] Runs an installed library module as a CLI tool
+python3 <script.py>                              # [#python] Executes a Python script via the interpreter
+python3 -m <module>                              # [#python] Runs an installed library module as a CLI tool
 node <script.js>                                 # [#nodejs] Executes a JavaScript file server-side
 deno run [-A] <script.ts|js>                     # [#deno] Runs TypeScript/JavaScript (`-A`: grant all permissions)
 bash <script.sh>                                 # [#bash] Runs a shell script directly
 sh <script.sh>                                   # [#bash] Runs a script using POSIX shell compatibility
 perl <script.pl>                                 # [#perl] Executes a Perl script
 ruby <script.rb>                                 # [#ruby] Executes a Ruby script
+lua <script.lua>                                 # [#lua] Executes a Lua script using the standard interpreter
 luajit <script.lua>                              # [#luajit] Executes a Lua script using the JIT compiler
+love <project_dir>                               # [#love] Runs a 2D game project folder or zipped .love package
 java -jar <file.jar>                             # [#jdk-openjdk] Runs a packaged Java application (.jar file)
 java <MainClass>                                 # [#jdk-openjdk] Runs a compiled Java class file directly
 ./<executable_file>                              # Running compiled binaries/scripts directly (needs `chmod +x`)
@@ -338,21 +342,22 @@ spectacle -r -b -c                               # [#spectacle] Takes a rectangu
 kinfo                                            # Displays a summary of your system information, KDE Plasma version, and Frameworks details
 
 # === DESKTOP, MEDIA & UTILITIES ===
-ffmpeg -i <in> <out>                             # [#ffmpeg] Converts, records, and streams audio and video file formats via the command line
-magick <in> <out>                                # [#imagemagick] Creates, edits, and converts bitmap images via the command line
-pandoc <in> -o <out>                             # [#pandoc-cli] Converts document formats (Markdown, PDF, HTML, Docx)
-pdftoppm -png <file.pdf> <prefix>                # [#poppler] Converts PDF pages to PNG images
-pdfunite <in1> <in2> <out.pdf>                   # [#poppler] Merges PDFs into a single file
-yt-dlp <url>                                     # [#yt-dlp] Downloads videos and audio from YouTube and other streaming sites
-mpv <file_or_url>                                # [#mpv] A command-line media player for audio and video streams (Space to pause, "q" to quit)
+ffmpeg -i <in> [<options>] <out>                 # [#ffmpeg] Converts, records, and streams audio and video file formats (`-i`: input file; `-c:v`: video codec; `-c:a`: audio codec)
+ffprobe [-hide_banner] <file>                    # [#ffmpeg] Utility to display media file information and stream properties (`-hide_banner`: suppress copyright notice)
+magick <in> [-resize <WxH>] <out>                # [#imagemagick] Creates, edits, and converts bitmap images (`-resize`: scale image dimensions; `-quality`: set compression level)
+pandoc <in> -o <out>                             # [#pandoc-cli] Converts document formats (Markdown, PDF, HTML, Docx) (`-o`: output file path)
+pdftoppm [-png|-jpg] <file.pdf> <prefix>         # [#poppler] Converts PDF pages to images (`-png`: output as PNG; `-jpg`: output as JPEG)
+pdfunite <in1> <in2> <out.pdf>                   # [#poppler] Merges multiple PDF files into a single output document
+yt-dlp [-x] [-f <format>] <url>                  # [#yt-dlp] Downloads videos and audio from YouTube and other streaming sites (`-x`: extract audio; `-f`: select format)
+mpv [--no-video] <file_or_url>                   # [#mpv] A command-line media player for audio and video streams (Space to pause, "q" to quit; `--no-video`: play audio only)
 tar [-xzf|-czf] <archive> <files>                # Utility to manipulate archive files (`-xzf`: extract a gzip compressed tarball; `-czf`: create a new tarball)
-zip -r <archive.zip> <dir>                       # [#zip] Packages and compresses a directory into a standard ZIP archive
-unzip <archive.zip>                              # [#unzip] Extracts compressed files from a standard ZIP archive into the current directory
-7z [a|x] <archive> <target>                      # [#7zip] A high-compression archiving tool (`a`: add/compress files into an archive; `x`: extract files)
-nano <file>                                      # Opens a terminal-based text editor for editing files (Ctrl+O to save, Enter to confirm, Ctrl+X to exit)
-vim <file>                                       # [#vim] Opens a modal keyboard-driven text editor (press "i" to insert, ESC then ":wq" to save and quit, ":q!" to quit without saving)
+zip [-r] <archive.zip> <dir>                     # [#zip] Packages and compresses files into a standard ZIP archive (`-r`: recursively include directories)
+unzip [-d <dir>] <archive.zip>                   # [#unzip] Extracts compressed files from a standard ZIP archive (`-d`: target directory)
+7z [a|x] [-p<pwd>] <archive> <target>            # [#7zip] A high-compression archiving tool (`a`: add/compress files; `x`: extract files; `-p`: set/use password)
+nano [+<line>] <file>                            # Opens a terminal-based text editor for editing files (Ctrl+O to save, Enter to confirm, Ctrl+X to exit; `+line`: open at specific line)
+vim [+<line>] <file>                             # [#vim] Opens a modal keyboard-driven text editor (press "i" to insert, ESC then ":wq" to save and quit, ":q!" to quit without saving)
 rsync [-avP] <src> [<user>@<host>:]<dst>         # [#rsync] Syncs/copies files locally or to/from a remote server (`-a`: archive; `-v`: verbose; `-P`: progress)
-exiftool <file>                                  # [#perl-image-exiftool] Reads, writes, and modifies metadata tags across a vast range of media files
+exiftool [-all=] <file>                          # [#perl-image-exiftool] Reads, writes, and modifies metadata tags across media files (`-all=`: strip all metadata)
 
 # === GIT & VERSION CONTROL ===
 git init                                         # [#git] Initializes a new, empty Git repository in the current directory
@@ -365,7 +370,7 @@ git pull [remote] [branch]                       # [#git] Fetches and merges cha
 git branch [-a]                                  # [#git] Lists, creates, or deletes branches (`-a`: list both local and remote branches)
 git checkout <branch> / switch <branch>          # [#git] Switches to a specified branch or restores working tree files
 git log [--oneline]                              # [#git] Displays the commit history (`--oneline`: condenses each commit to a single line)
-git diff [<file>]                                # [#git] Shows line changes made in files that are not yet staged or between commits
+git diff [--staged|-w] [<file1>] [<file2>]       # [#git] Shows changes in files or between commits (`--staged`: show staged changes; `-w`: ignore whitespace)
 git stash                                        # [#git] Temporarily shelves uncommitted changes to work on something else (pop to restore)
 
 # === ESSENTIAL DIRECTORIES & SYSTEM FILES ===
@@ -419,3 +424,7 @@ git stash                                        # [#git] Temporarily shelves un
 /etc/crontab                                     # System-wide table file for scheduling automated background tasks
 /etc/cron.*/                                     # Periodic directories (cron.hourly, cron.daily, etc.) for scheduled execution scripts
 /etc/modprobe.d/                                 # Configuration directory for customizing kernel module options and blocklists
+/etc/sysctl.d/                                   # Directory for kernel runtime parameters and security hardening configurations
+/etc/udev/rules.d/                               # Custom dynamic device node rules for hardware detection and configuration
+/etc/default/grub                                # Main configuration file for customizing GRUB bootloader parameters and kernel command lines
+/boot/grub/grub.cfg                              # Compiled GRUB configuration file executed at boot (generated automatically via grub-mkconfig)
