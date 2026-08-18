@@ -229,7 +229,7 @@ whois <domain>                                   # [#whois] Queries the WHOIS da
 curl -O <url>                                    # Transfers data from or to a server, downloading a file using its remote filename
 wget [-O <file>] <url>                           # [#wget] A non-interactive network downloader for retrieving files (`-O`: save under a custom filename)
 iperf3 -s [-p <port>]                            # [#iperf3] Starts a network performance server (`-p`: specify custom port)
-iperf3 -c <host> [-u|-R|-P <num>|-t <sec>]       # [#iperf3] Tests bandwidth/network perf against a server (`-u`: UDP; `-R`: reverse mode; `-P`: parallel streams; `-t`: duration)
+iperf3 -c <host> [-u|-R|-P <num>|-t <sec>]       # [#iperf3] Tests bandwidth/network performance against a server (`-u`: UDP; `-R`: reverse mode; `-P`: parallel streams; `-t`: duration)
 ssh [-p <port>] <user>@<host>                    # Establishes an encrypted secure shell session on a remote server (`-p`: specify custom port)
 scp [-r] <src> <user>@<host>:<dest>              # Securely copies files over an SSH network connection (`-r`: recursively copy directories)
 
