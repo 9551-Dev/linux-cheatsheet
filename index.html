@@ -446,11 +446,28 @@
             window.history.replaceState({}, "", url);
         }
 
-        fetch("cheatsheet.md")
-            .then(response => {
-                if (!response.ok) throw new Error("Could not load file");
-                return response.text();
-            })
+        async function fetch_with_retries(url, retries = 3, delay = 1000) {
+            for (let attempt = 1; attempt <= retries; attempt++) {
+                try {
+                    const response = await fetch(url);
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    return await response.text();
+                } catch (error) {
+                    console.warn(`Fetch attempt ${attempt} failed: ${error.message}`);
+
+
+                    if (attempt === retries) {
+                        throw new Error(`Failed to load ${url} after ${retries} attempts.`);
+                    }
+
+                    await new Promise(resolve => setTimeout(resolve, delay * Math.pow(2, attempt - 1)));
+                }
+            }
+        }
+
+        fetch_with_retries("cheatsheet.md", 3, 1000)
             .then(text => {
                 const code_element = document.getElementById("cheatsheet_code");
                 const raw_lines = text.split("\n");
@@ -650,7 +667,7 @@
                 }
             })
             .catch(error => {
-                document.getElementById("cheatsheet_code").textContent = "Error loading cheatsheet.md";
+                document.getElementById("cheatsheet_code").textContent = "Error loading cheatsheet.md after multiple attempts.";
                 console.error(error);
             });
     </script>
