@@ -768,73 +768,90 @@
                     return Math.round(final_score);
                 }
 
-                let search_timeout = null;
+                function perform_search(raw_query) {
+                    const query = raw_query.toLowerCase().trim();
 
-                search_box.addEventListener("input", (e) => {
-                    const query = e.target.value.toLowerCase().trim();
+                    if (query !== "") {
+                        body_element.classList.add("filtering");
+                    } else {
+                        body_element.classList.remove("filtering");
+                    }
 
-                    clearTimeout(search_timeout);
+                    const parent = pre_element.parentNode;
+                    parent.removeChild(pre_element);
 
-                    search_timeout = setTimeout(() => {
-                        update_url_query(query);
+                    if (query === "") {
+                        line_data.forEach(item => {
+                            const el = line_elements[item.index];
+                            el.classList.remove("hidden");
+                            el.classList.remove("highlight_match");
+                            el.classList.remove("dimmed_match");
+                            code_element.appendChild(el);
+                        });
+                    } else {
+                        const scored_lines = line_data.map((item, index) => {
+                            if (item.is_header || item.is_spacer) return { item, score: -1000 };
+                            const targetObj = preprocessed_targets[index];
+                            const score = get_match_score(query, targetObj, index);
+                            return { item, score };
+                        });
 
-                        if (query !== "") {
-                            body_element.classList.add("filtering");
-                        } else {
-                            body_element.classList.remove("filtering");
-                        }
+                        scored_lines.sort((a, b) => b.score - a.score);
 
-                        const parent = pre_element.parentNode;
-                        parent.removeChild(pre_element);
+                        const fragment = document.createDocumentFragment();
 
-                        if (query === "") {
-                            line_data.forEach(item => {
-                                const el = line_elements[item.index];
+                        scored_lines.forEach(({ item, score }) => {
+                            const el = line_elements[item.index];
+                            if (score >= -500) {
                                 el.classList.remove("hidden");
+
+                                if (score > -50) {
+                                    el.classList.add("highlight_match");
+                                    el.classList.remove("dimmed_match");
+                                } else {
+                                    el.classList.remove("highlight_match");
+                                    el.classList.add("dimmed_match");
+                                }
+
+                                fragment.appendChild(el);
+                            } else {
+                                el.classList.add("hidden");
                                 el.classList.remove("highlight_match");
                                 el.classList.remove("dimmed_match");
-                                code_element.appendChild(el);
-                            });
-                        } else {
-                            const scored_lines = line_data.map((item, index) => {
-                                if (item.is_header || item.is_spacer) return { item, score: -1000 };
-                                const targetObj = preprocessed_targets[index];
-                                const score = get_match_score(query, targetObj, index);
-                                return { item, score };
-                            });
+                            }
+                        });
 
-                            scored_lines.sort((a, b) => b.score - a.score);
+                        code_element.innerHTML = "";
+                        code_element.appendChild(fragment);
+                    }
 
-                            const fragment = document.createDocumentFragment();
+                    parent.appendChild(pre_element);
 
-                            scored_lines.forEach(({ item, score }) => {
-                                const el = line_elements[item.index];
-                                if (score >= -500) {
-                                    el.classList.remove("hidden");
+                    code_element.scrollTop = 0;
+                    pre_element.scrollTop = 0;
 
-                                    if (score > -50) {
-                                        el.classList.add("highlight_match");
-                                        el.classList.remove("dimmed_match");
-                                    } else {
-                                        el.classList.remove("highlight_match");
-                                        el.classList.add("dimmed_match");
-                                    }
+                    if (wrapper_container) wrapper_container.scrollTop = 0;
 
-                                    fragment.appendChild(el);
-                                } else {
-                                    el.classList.add("hidden");
-                                    el.classList.remove("highlight_match");
-                                    el.classList.remove("dimmed_match");
-                                }
-                            });
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                }
 
-                            code_element.innerHTML = "";
-                            code_element.appendChild(fragment);
+                let search_timeout = null;
+                search_box.addEventListener("input", (e) => {
+                    const query = e.target.value;
+                    clearTimeout(search_timeout);
+                    search_timeout = setTimeout(() => {
+                        if (typeof update_url_query === "function") {
+                            update_url_query(query.toLowerCase().trim());
                         }
-
-                        parent.appendChild(pre_element);
+                        perform_search(query);
                     }, 150);
                 });
+
+                const url_params = new URLSearchParams(window.location.search);
+                const initial_query = url_params.get("q") || url_params.get("search") || "";
+                if (initial_query !== "") {
+                    perform_search(initial_query);
+                }
             })
             .catch(error => {
                 console.error(error);
