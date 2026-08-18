@@ -436,6 +436,16 @@
             apply_theme(current_theme);
         });
 
+        function update_url_query(query) {
+            const url = new URL(window.location);
+            if (query) {
+                url.searchParams.set("q", query);
+            } else {
+                url.searchParams.delete("q");
+            }
+            window.history.replaceState({}, "", url);
+        }
+
         fetch("cheatsheet.md")
             .then(response => {
                 if (!response.ok) throw new Error("Could not load file");
@@ -563,59 +573,76 @@
                     return total_score;
                 }
 
+                let search_timeout = null;
+
                 search_box.addEventListener("input", (e) => {
                     const query = e.target.value.toLowerCase().trim();
 
-                    if (query !== "") {
-                        body_element.classList.add("filtering");
-                    } else {
-                        body_element.classList.remove("filtering");
-                    }
+                    clearTimeout(search_timeout);
 
-                    const parent = pre_element.parentNode;
-                    parent.removeChild(pre_element);
+                    search_timeout = setTimeout(() => {
+                        update_url_query(query);
 
-                    if (query === "") {
-                        line_data.forEach(item => {
-                            const el = line_elements[item.index];
-                            el.classList.remove("hidden");
-                            el.classList.remove("highlight_match");
-                            code_element.appendChild(el);
-                        });
-                    } else {
-                        const scored_lines = line_data.map(item => {
-                            if (item.is_header || item.is_spacer) return { item, score: -1 };
-                            const score = get_match_score(query, item.text);
-                            return { item, score };
-                        });
+                        if (query !== "") {
+                            body_element.classList.add("filtering");
+                        } else {
+                            body_element.classList.remove("filtering");
+                        }
 
-                        scored_lines.sort((a, b) => b.score - a.score);
+                        const parent = pre_element.parentNode;
+                        parent.removeChild(pre_element);
 
-                        scored_lines.forEach(({ item, score }) => {
-                            const el = line_elements[item.index];
-                            if (score > 0) {
+                        if (query === "") {
+                            line_data.forEach(item => {
+                                const el = line_elements[item.index];
                                 el.classList.remove("hidden");
-                                el.classList.add("highlight_match");
-                            } else {
-                                el.classList.add("hidden");
                                 el.classList.remove("highlight_match");
-                            }
-                        });
+                                code_element.appendChild(el);
+                            });
+                        } else {
+                            const scored_lines = line_data.map(item => {
+                                if (item.is_header || item.is_spacer) return { item, score: -1 };
+                                const score = get_match_score(query, item.text);
+                                return { item, score };
+                            });
 
-                        scored_lines.forEach(({ item, score }) => {
-                            if (score > 0) {
-                                code_element.appendChild(line_elements[item.index]);
-                            }
-                        });
-                        scored_lines.forEach(({ item, score }) => {
-                            if (score <= 0) {
-                                code_element.appendChild(line_elements[item.index]);
-                            }
-                        });
-                    }
+                            scored_lines.sort((a, b) => b.score - a.score);
 
-                    parent.appendChild(pre_element);
+                            scored_lines.forEach(({ item, score }) => {
+                                const el = line_elements[item.index];
+                                if (score > 0) {
+                                    el.classList.remove("hidden");
+                                    el.classList.add("highlight_match");
+                                } else {
+                                    el.classList.add("hidden");
+                                    el.classList.remove("highlight_match");
+                                }
+                            });
+
+                            scored_lines.forEach(({ item, score }) => {
+                                if (score > 0) {
+                                    code_element.appendChild(line_elements[item.index]);
+                                }
+                            });
+                            scored_lines.forEach(({ item, score }) => {
+                                if (score <= 0) {
+                                    code_element.appendChild(line_elements[item.index]);
+                                }
+                            });
+                        }
+
+                        parent.appendChild(pre_element);
+                    }, 150);
                 });
+
+                // Sync input state with URL query parameter on initial load
+                const url_params = new URLSearchParams(window.location.search);
+                const initial_query = url_params.get("q");
+
+                if (initial_query) {
+                    search_box.value = initial_query;
+                    search_box.dispatchEvent(new Event("input"));
+                }
             })
             .catch(error => {
                 document.getElementById("cheatsheet_code").textContent = "Error loading cheatsheet.md";
