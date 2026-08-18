@@ -13,6 +13,8 @@ rm [-rf|-i] <file>                               # Removes files or directories 
 mkdir [-p] <dir>                                 # Creates a new directory (`-p`: create parent directories as needed without throwing errors if they exist)
 touch <file>                                     # Creates a new empty file or updates the access and modification timestamps of an existing one
 ln [-s] <target> <link_name>                     # Creates links between files (`-s`: creates a symbolic/soft link pointing to a path, rather than a hard link)
+du [-h|-s|-d <num>] [<path>]                     # Estimates disk space usage (`-h`: human readable; `-s`: summary only; append `*` for dir items)
+df -h                                            # Displays filesystem disk space usage summaries in human-readable units
 cat <file>                                       # Outputs the entire contents of a file directly to the standard output stream
 less <file>                                      # Opens a file for interactive, page-by-page viewing (use arrow keys to scroll, "/" to search, press "q" to exit)
 head [-n <num>] <file>                           # Outputs the first lines of a file (defaults to 10 lines; use `-n` to specify a custom line count)
@@ -185,26 +187,49 @@ shutdown now                                     # An alternative command to imm
 
 # === SYSTEM AUDITING & LOGS ===
 last                                             # Shows a listing of last logged-in users and system reboots
+lastb                                            # Shows a listing of failed login attempts, useful for detecting brute-force SSH attacks
+w                                                # Displays currently logged-in users, their active terminal sessions, and system load
 lsof [-i|-u]                                     # Lists open files and the processes that opened them (`-i`: list network connections)
-dmesg [-w]                                       # Prints or controls the kernel ring buffer to inspect hardware and driver messages (`-w`: wait for new messages/follow)
+dmesg [-w]                                       # Prints or controls the kernel ring buffer to inspect hardware and driver messages (`-w`: wait/follow)
+journalctl [-b|-p 3|-xe]                         # Queries systemd logs (`-b`: since current boot; `-p 3`: errors only; `-xe`: end of log with details)
+strace [-p <pid>] <cmd>                          # Traces system calls and signals for a command or running PID to audit process behavior
+watch [-n <sec>] <cmd>                           # Executes a command periodically and displays the output fullscreen to monitor live changes
+tail -f /var/log/pacman.log                      # Monitors the Arch package manager log in real-time to audit software installations and updates
 
 # === PERMISSIONS & OWNERSHIP ===
 sudo <command>                                   # Executes a single command with administrative superuser (root) privileges
 su [-] <user>                                    # Switches the current user session context (run plain "su" or "su -" to switch to root)
 chmod [-R] <perms> <file>                        # Modifies file access permissions (`-R`: recursive; e.g., 755 for scripts, 644 for files, +x to make executable)
 chown [-R] <user>:<group> <file>                 # Changes the user and group ownership of a file or directory (`-R`: apply recursively)
-passwd                                           # Changes the current user account's password
+passwd [<user>]                                  # Changes the password for the current user (or a specified user if run with sudo)
+id [<user>]                                      # Prints the user ID (UID), group ID (GID), and all supplementary group memberships
+sudo usermod -aG <group> <user>                  # Appends a user to a supplementary group (e.g., adding a user to `wheel` or `docker`)
+chattr [+|-]i <file>                             # Modifies advanced file attributes (`+i`: makes a file immutable, preventing edits or deletion even by root)
+lsattr <file>                                    # Lists advanced file attributes (useful for checking if a file has been made immutable)
+umask [<octal>]                                  # Displays or sets the default file creation permission mask for the current shell session
 
 # === NETWORKING, DNS & SSH ===
 nmtui                                            # Opens an interactive text-based user interface to manage network connections and Wi-Fi
 nmcli device status                              # Displays a tabular list of network interface devices and their current connection states
 ip a                                             # Displays network interface configurations, hardware addresses, and local IP assignments
+ip link [set <dev> <up|down>]                    # Displays Layer 2 MAC status, or enables (up)/disables (down) a specific network interface
 ip route                                         # Displays and modifies the kernel network routing table and gateway settings
-ss -tulpn                                        # Displays socket statistics, listing active listening ports and their associated processes
+ip neigh                                         # Displays the neighbor/ARP table showing IP address to MAC address mappings on the local network
+ifconfig [-a|<dev> <up|down>]                    # [#net-tools] Legacy tool for network interfaces (replaced by ip; `-a`: show all, including down)
 ping [-c <count>] <host>                         # Sends ICMP echo request packets to test network connectivity (`-c`: limit packet count)
+traceroute <host>                                # [#traceroute] Tracks the route packets take to reach a remote host, displaying hop delays
+tracepath <host>                                 # Traces the network path discovering MTU along the way (does not require root privileges)
+ss -tulpn                                        # Displays socket statistics, listing active listening ports and their associated processes
+netstat [-tulpn]                                 # [#net-tools] Legacy tool for network connections (`-tulpn`: active TCP/UDP listening processes)
+sudo tcpdump [-i <dev>]                          # [#tcpdump] Captures and displays real-time network packets (`-i`: specify network interface)
+nmap [-p <port>|-sV|-O|-A|-sn] <target-net>      # [#nmap] Scans a host (`-p`: specify ports; `-sV`: service versions; `-O`: OS detect; `-A`: aggressive; `-sn`: ping scan/host discovery)
 dig <domain>                                     # [#bind] Queries DNS name servers for information regarding host addresses, MX records, and zone lookups
+nslookup <domain>                                # [#bind] Queries internet name servers interactively or directly to find IP addresses
+whois <domain>                                   # [#whois] Queries the WHOIS database to retrieve domain registration and ownership information
 curl -O <url>                                    # Transfers data from or to a server, downloading a file using its remote filename
 wget [-O <file>] <url>                           # [#wget] A non-interactive network downloader for retrieving files (`-O`: save under a custom filename)
+perf3 -s [-p <port>]                             # [#iperf3] Starts a network performance server (`-p`: specify custom port)
+iperf3 -c <host> [-u|-R|-P <num>|-t <sec>]       # [#iperf3] Tests bandwidth against a server (`-u`: UDP; `-R`: reverse mode; `-P`: parallel streams; `-t`: duration)
 ssh [-p <port>] <user>@<host>                    # Establishes an encrypted secure shell session on a remote server (`-p`: specify custom port)
 scp [-r] <src> <user>@<host>:<dest>              # Securely copies files over an SSH network connection (`-r`: recursively copy directories)
 
@@ -214,7 +239,15 @@ blkid                                            # Prints block device attribute
 mount [-t <type>] [-o <opts>] <dev> <dir>        # Attaches a storage filesystem from a device to a designated directory tree path
 umount <dir>                                     # Detaches a currently mounted filesystem from the directory tree
 findmnt                                          # Lists currently mounted filesystems in an organized, searchable tree format
-df -h                                            # Displays filesystem disk space usage summaries in human-readable units
+
+# === DISK PARTITIONING & FORMATTING ===
+fdisk [-l] /dev/<sdX>                            # Manages partitions (`-l`: list tables; run without flags for interactive editor)
+parted -s /dev/<sdX> mklabel gpt                 # [#parted] Non-interactively creates a fresh GPT partition table on a disk
+parted -s /dev/<sdX> mkpart primary <fs> 0% 100% # [#parted] Non-interactively creates a single partition spanning the entire disk
+mkfs.<ext4|btrfs|vfat|xfs> /dev/<sdX1>           # Formats a partition with a specified filesystem type (ext4, btrfs, vfat/FAT32, xfs)
+mkswap <dev_or_file>                             # Sets up a Linux swap area on a partition or a pre-allocated file
+swapon <dev_or_file>                             # Activates a designated swap partition or file so the kernel can use it for virtual memory
+smartctl -a /dev/<sdX>                           # [#smartmontools] Displays detailed SMART health status, temperature, and diagnostics for a drive
 
 # === SYSTEM INFO & HARDWARE MONITORING ===
 fastfetch                                        # [#fastfetch] Displays system information, OS details, and hardware specs alongside an ASCII logo
