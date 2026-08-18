@@ -348,7 +348,7 @@ mpv <file_or_url>                                # [#mpv] A command-line media p
 tar [-xzf|-czf] <archive> <files>                # Utility to manipulate archive files (`-xzf`: extract a gzip compressed tarball; `-czf`: create a new tarball)
 zip -r <archive.zip> <dir>                       # [#zip] Packages and compresses a directory into a standard ZIP archive
 unzip <archive.zip>                              # [#unzip] Extracts compressed files from a standard ZIP archive into the current directory
-7z [a|x] <archive> <target>                      # [#7zip] A high-compression archiving tool (`a`: add/compress files into an archive; `-x`: extract files)
+7z [a|x] <archive> <target>                      # [#7zip] A high-compression archiving tool (`a`: add/compress files into an archive; `x`: extract files)
 nano <file>                                      # Opens a terminal-based text editor for editing files (Ctrl+O to save, Enter to confirm, Ctrl+X to exit)
 vim <file>                                       # [#vim] Opens a modal keyboard-driven text editor (press "i" to insert, ESC then ":wq" to save and quit, ":q!" to quit without saving)
 rsync [-avP] <src> [<user>@<host>:]<dst>         # [#rsync] Syncs/copies files locally or to/from a remote server (`-a`: archive; `-v`: verbose; `-P`: progress)
