@@ -809,10 +809,10 @@
 
                             scored_lines.forEach(({ item, score }) => {
                                 const el = line_elements[item.index];
-                                if (score >= -999) {
+                                if (score >= -500) {
                                     el.classList.remove("hidden");
 
-                                    if (score > 0) {
+                                    if (score > -50) {
                                         el.classList.add("highlight_match");
                                         el.classList.remove("dimmed_match");
                                     } else {
