@@ -484,12 +484,9 @@
                     return await response.text();
                 } catch (error) {
                     console.warn(`Fetch attempt ${attempt} failed: ${error.message}`);
-
-
                     if (attempt === retries) {
                         throw new Error(`Failed to load ${url} after ${retries} attempts.`);
                     }
-
                     await new Promise(resolve => setTimeout(resolve, delay * Math.pow(2, attempt - 1)));
                 }
             }
@@ -511,7 +508,6 @@
                         current_category = trimmed.replace(/^#+\s*===\s*|\s*===.*$/g, "").trim();
                     }
 
-                    // Push the actual line
                     line_categories.push(current_category);
                     line_data.push({
                         index: processed_lines.length,
@@ -521,7 +517,6 @@
                     });
                     processed_lines.push(line);
 
-                    // Insert an extra blank newline after every single line to double each newline
                     line_categories.push(current_category);
                     line_data.push({
                         index: processed_lines.length,
@@ -530,6 +525,34 @@
                         is_spacer: true
                     });
                     processed_lines.push("");
+                });
+
+                // normalization pre-proc
+                const preprocessed_targets = line_data.map(item => {
+                    if (item.is_header || item.is_spacer || !item.text.trim()) {
+                        return { norm_target: "", command_part: "", desc_part: "", is_path: false, target_words: [] };
+                    }
+
+                    const norm_target = item.text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/y/g, "i").replace(/(.)\1{2,}/g, "$1$1");
+
+                    let command_part = norm_target;
+                    let desc_part = "";
+                    const comment_idx = norm_target.indexOf("#");
+                    if (comment_idx !== -1) {
+                        command_part = norm_target.slice(0, comment_idx).trim();
+                        desc_part = norm_target.slice(comment_idx + 1).replace(/^\[#.*?\]\s*/, "").trim();
+                    }
+
+                    const is_path = command_part.startsWith("/") || command_part.startsWith("~/") || command_part.startsWith("$");
+                    const target_words = norm_target.split(/[\s/._,-]+/).filter(Boolean);
+
+                    return {
+                        norm_target,
+                        command_part,
+                        desc_part,
+                        is_path,
+                        target_words
+                    };
                 });
 
                 const final_text = processed_lines.join("\n");
@@ -573,50 +596,166 @@
                 const pre_element = code_element.closest("pre");
                 const wrapper_container = document.querySelector(".wrapper_container");
 
-                function get_match_score(query, target) {
-                    if (!query) return 0;
+                function get_match_score(query, targetObj, original_index = -1) {
+                    if (!query || !query.trim() || !targetObj.norm_target) return -1000;
 
-                    const query_tokens = query.split(/\s+/).filter(Boolean);
-                    let total_score = 0;
+                    const norm_query = query.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/y/g, "i").replace(/(.)\1{2,}/g, "$1$1");
+                    if (norm_query === targetObj.norm_target) return 5000;
 
-                    for (const token of query_tokens) {
-                        if (target.includes(token)) {
-                            let score = 200 + (token.length * 20);
-                            if (target.startsWith(token)) score += 100;
-                            total_score += score;
-                            continue;
+                    const { command_part, desc_part, is_path, target_words, norm_target } = targetObj;
+                    const target_penalty = is_path ? 400 : 0;
+                    const query_tokens = norm_query.split(/[\s/_-]+/).filter(Boolean);
+
+                    let short_command_penalty = 0;
+                    if (query_tokens.length > 1 && command_part.length <= 3) {
+                        const is_command_explicitly_typed = query_tokens[0] === command_part || norm_query.startsWith(command_part + " ");
+                        if (!is_command_explicitly_typed) {
+                            short_command_penalty = 1500;
                         }
-
-                        let q_idx = 0;
-                        let t_idx = 0;
-                        let score = 0;
-                        let consecutive = 0;
-                        let first_match_idx = -1;
-
-                        while (q_idx < token.length && t_idx < target.length) {
-                            if (token[q_idx] === target[t_idx]) {
-                                if (first_match_idx === -1) first_match_idx = t_idx;
-                                consecutive++;
-                                let boundary_bonus = 0;
-                                if (t_idx === 0 || /[-_\s./]/.test(target[t_idx - 1])) {
-                                    boundary_bonus = 30;
-                                }
-                                score += 15 + (consecutive * 10) + boundary_bonus;
-                                q_idx++;
-                            } else {
-                                consecutive = 0;
-                                score -= 3;
-                            }
-                            t_idx++;
-                        }
-
-                        if (q_idx < token.length) return 0;
-
-                        score -= first_match_idx * 1.5;
-                        total_score += Math.max(score, 1);
                     }
 
-                    return total_score;
+                    let length_mismatch_penalty = 0;
+                    if (norm_query.length > command_part.length + 3) {
+                        length_mismatch_penalty = (norm_query.length - command_part.length) * 35;
+                    }
+
+                    let base_score = 0;
+
+                    // Strategy 1: Command start match
+                    if (command_part.startsWith(norm_query)) {
+                        let root_bonus = (norm_query === "/") ? 1000 : 0;
+                        const next_char = command_part[norm_query.length];
+                        const is_clean_boundary = !next_char || /[\s/<#._-]/.test(next_char);
+                        let boundary_bonus = is_clean_boundary ? 300 : 0;
+
+                        base_score = Math.max(base_score, 2800 + (norm_query.length * 20) + root_bonus + boundary_bonus);
+                    }
+
+                    // Strategy 2: Exact phrase match
+                    const exact_phrase_idx = norm_target.indexOf(norm_query);
+                    if (exact_phrase_idx !== -1) {
+                        let position_penalty = exact_phrase_idx * 1.5;
+                        let start_bonus = (exact_phrase_idx === 0) ? 300 : 0;
+
+                        const match_end_idx = exact_phrase_idx + norm_query.length;
+                        const next_char = norm_target[match_end_idx];
+                        const is_clean_boundary = (match_end_idx === norm_target.length) || /[\s/<#._-]/.test(next_char);
+                        let boundary_bonus = is_clean_boundary ? 400 : 0;
+
+                        let desc_bonus = 0;
+                        if (desc_part.length > 0) {
+                            const desc_match_idx = desc_part.indexOf(norm_query);
+                            if (desc_match_idx !== -1) {
+                                const is_desc_word_start = desc_match_idx === 0 || /[\s/._-]/.test(desc_part[desc_match_idx - 1]);
+                                if (is_desc_word_start) {
+                                    desc_bonus = (desc_match_idx === 0) ? 600 : Math.max(0, 300 - (desc_match_idx * 2));
+                                }
+                            }
+                        }
+
+                        let phrase_score = 2000 + start_bonus + boundary_bonus - position_penalty + desc_bonus;
+                        if (norm_query.length > 2 || is_clean_boundary) {
+                            base_score = Math.max(base_score, phrase_score);
+                        }
+                    }
+
+                    // Strategy 3: Token & fuzzy matching
+                    if (/^[\s/_-]+$/.test(query)) {
+                        if (command_part.startsWith(norm_query)) {
+                            let leading_symbol_bonus = (command_part === "/") ? 5000 : 4000;
+                            base_score = Math.max(base_score, leading_symbol_bonus);
+                        } else if (command_part.includes(norm_query)) {
+                            base_score = Math.max(base_score, 500);
+                        } else {
+                            base_score = 0;
+                        }
+                    } else {
+                        if (query_tokens.length > 0) {
+                            let token_score = 0;
+                            let matched_tokens_count = 0;
+                            let earliest_match_idx = Infinity;
+                            let last_token_end_idx = -1;
+                            let full_word_matches_count = 0;
+
+                            for (const token of query_tokens) {
+                                const match_idx = norm_target.indexOf(token);
+                                const is_word_prefix = target_words.some(w => w.startsWith(token));
+                                const is_exact_word = target_words.includes(token);
+
+                                if (match_idx !== -1 || is_word_prefix) {
+                                    matched_tokens_count++;
+
+                                    const effective_match_idx = match_idx !== -1 ? match_idx : norm_target.indexOf(token);
+                                    earliest_match_idx = Math.min(earliest_match_idx, effective_match_idx);
+
+                                    let order_bonus = (last_token_end_idx !== -1 && effective_match_idx >= last_token_end_idx) ? 100 : 0;
+                                    let word_bonus = 0;
+
+                                    if (is_exact_word) {
+                                        word_bonus = 300;
+                                        full_word_matches_count++;
+                                    } else if (is_word_prefix) {
+                                        word_bonus = 240;
+                                        full_word_matches_count++;
+                                    } else {
+                                        word_bonus = 80;
+                                    }
+
+                                    let position_penalty = effective_match_idx * 1.5;
+                                    let score = 300 + (token.length * 20) + word_bonus + order_bonus - position_penalty;
+                                    token_score += Math.max(score, 50);
+                                    last_token_end_idx = effective_match_idx + token.length;
+                                    continue;
+                                }
+
+                                let q_idx = 0;
+                                let t_idx = 0;
+                                let score = 0;
+                                let consecutive = 0;
+                                let first_match_idx = -1;
+
+                                while (q_idx < token.length && t_idx < norm_target.length) {
+                                    if (token[q_idx] === norm_target[t_idx]) {
+                                        if (first_match_idx === -1) first_match_idx = t_idx;
+                                        consecutive++;
+                                        let boundary_bonus = (t_idx === 0 || /[\s/._-]/.test(norm_target[t_idx - 1])) ? 30 : 0;
+                                        score += 15 + (consecutive * 10) + boundary_bonus;
+                                        q_idx++;
+                                    } else {
+                                        consecutive = 0;
+                                        score -= 3;
+                                    }
+                                    t_idx++;
+                                }
+
+                                if (q_idx >= token.length) {
+                                    matched_tokens_count++;
+                                    score -= first_match_idx * 1.5;
+                                    earliest_match_idx = Math.min(earliest_match_idx, first_match_idx);
+                                    token_score += Math.max(score, 10);
+                                }
+                            }
+
+                            if (matched_tokens_count > 0) {
+                                let match_ratio_multiplier = Math.pow(matched_tokens_count / query_tokens.length, 1.2);
+                                let multi_word_completeness_bonus = (full_word_matches_count > 1) ? (full_word_matches_count * 800) : 0;
+
+                                if (earliest_match_idx !== Infinity) {
+                                    token_score += Math.max(0, 150 - (earliest_match_idx * 3));
+                                }
+
+                                base_score = Math.max(base_score, Math.round((token_score + multi_word_completeness_bonus) * match_ratio_multiplier));
+                            }
+                        }
+                    }
+
+                    let final_score = base_score - target_penalty - length_mismatch_penalty - short_command_penalty;
+
+                    if (typeof original_index === "number" && original_index >= 0) {
+                        final_score -= (original_index * 1.5);
+                    }
+
+                    return Math.round(final_score);
                 }
 
                 let search_timeout = null;
@@ -646,59 +785,41 @@
                                 code_element.appendChild(el);
                             });
                         } else {
-                            const scored_lines = line_data.map(item => {
-                                if (item.is_header || item.is_spacer) return { item, score: -1 };
-                                const score = get_match_score(query, item.text);
+                            const scored_lines = line_data.map((item, index) => {
+                                if (item.is_header || item.is_spacer) return { item, score: -1000 };
+                                const targetObj = preprocessed_targets[index];
+                                const score = get_match_score(query, targetObj, index);
                                 return { item, score };
                             });
 
                             scored_lines.sort((a, b) => b.score - a.score);
 
+                            const fragment = document.createDocumentFragment();
+
                             scored_lines.forEach(({ item, score }) => {
                                 const el = line_elements[item.index];
-                                if (score > 0) {
+                                if (score > -100) {
                                     el.classList.remove("hidden");
                                     el.classList.add("highlight_match");
+                                    fragment.appendChild(el);
                                 } else {
                                     el.classList.add("hidden");
                                     el.classList.remove("highlight_match");
                                 }
                             });
 
-                            scored_lines.forEach(({ item, score }) => {
-                                if (score > 0) {
-                                    code_element.appendChild(line_elements[item.index]);
-                                }
-                            });
-                            scored_lines.forEach(({ item, score }) => {
-                                if (score <= 0) {
-                                    code_element.appendChild(line_elements[item.index]);
-                                }
-                            });
+                            code_element.innerHTML = "";
+                            code_element.appendChild(fragment);
                         }
 
                         parent.appendChild(pre_element);
-
-                        if (wrapper_container) {
-                            wrapper_container.scrollTop = 0;
-                        }
                     }, 150);
                 });
-
-                // Sync input state with URL query parameter on initial load
-                const url_params = new URLSearchParams(window.location.search);
-                const initial_query = url_params.get("q");
-
-                if (initial_query) {
-                    search_box.value = initial_query;
-                    search_box.dispatchEvent(new Event("input"));
-                }
             })
             .catch(error => {
-                document.getElementById("cheatsheet_code").textContent = "Error loading cheatsheet.md after multiple attempts.";
                 console.error(error);
+                document.getElementById("cheatsheet_code").textContent = "Failed to load cheatsheet.";
             });
     </script>
-
 </body>
 </html>

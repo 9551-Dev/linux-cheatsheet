@@ -357,7 +357,7 @@ unzip [-d <dir>] <archive.zip>                   # [#unzip] Extracts compressed 
 7z [a|x] [-p<pwd>] <archive> <target>            # [#7zip] A high-compression archiving tool (`a`: add/compress files; `x`: extract files; `-p`: set/use password)
 nano [+<line>] <file>                            # Opens a terminal-based text editor for editing files (Ctrl+O to save, Enter to confirm, Ctrl+X to exit; `+line`: open at specific line)
 vim [+<line>] <file>                             # [#vim] Opens a modal keyboard-driven text editor (press "i" to insert, ESC then ":wq" to save and quit, ":q!" to quit without saving)
-rsync [-avP] <src> [<user>@<host>:]<dst>         # [#rsync] Syncs/copies files locally or to/from a remote server (`-a`: archive; `-v`: verbose; `-P`: progress)
+rsync [-avP] <src> [<user>@<host>:]<dst>         # [#rsync] Syncs/copies files locally or to/from a remote server over the network (`-a`: archive; `-v`: verbose; `-P`: progress)
 exiftool [-all=] <file>                          # [#perl-image-exiftool] Reads, writes, and modifies metadata tags across media files (`-all=`: strip all metadata)
 
 # === GIT & VERSION CONTROL ===
