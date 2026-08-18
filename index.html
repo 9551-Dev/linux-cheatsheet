@@ -229,6 +229,16 @@
             background-color: var(--highlight-bg);
         }
 
+        .code_line.dimmed_match {
+            background-color: rgba(255, 255, 255, 0.02);
+            opacity: 0.4;
+        }
+
+        body.theme_light .code_line.dimmed_match {
+            background-color: rgba(0, 0, 0, 0.02);
+            opacity: 0.5;
+        }
+
         .code_content {
             display: table-cell;
             white-space: pre;
@@ -782,6 +792,7 @@
                                 const el = line_elements[item.index];
                                 el.classList.remove("hidden");
                                 el.classList.remove("highlight_match");
+                                el.classList.remove("dimmed_match");
                                 code_element.appendChild(el);
                             });
                         } else {
@@ -798,13 +809,22 @@
 
                             scored_lines.forEach(({ item, score }) => {
                                 const el = line_elements[item.index];
-                                if (score > -100) {
+                                if (score >= -999) {
                                     el.classList.remove("hidden");
-                                    el.classList.add("highlight_match");
+
+                                    if (score > 0) {
+                                        el.classList.add("highlight_match");
+                                        el.classList.remove("dimmed_match");
+                                    } else {
+                                        el.classList.remove("highlight_match");
+                                        el.classList.add("dimmed_match");
+                                    }
+
                                     fragment.appendChild(el);
                                 } else {
                                     el.classList.add("hidden");
                                     el.classList.remove("highlight_match");
+                                    el.classList.remove("dimmed_match");
                                 }
                             });
 
