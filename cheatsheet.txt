@@ -287,34 +287,34 @@ sudo modprobe <module>                           # Loads a kernel module and its
 sudo rmmod <module>                              # Removes or unloads a currently active module from the Linux kernel
 
 # === DOCKER & CONTAINERIZATION ===
-docker run [options] <image>                            # [#docker] Creates and starts a new container from a specified Docker image
-docker ps [-a]                                          # [#docker] Lists running containers (`-a`: include stopped containers)
-docker start <container>                                # [#docker] Starts one or more already created containers
-docker stop <container>                                 # [#docker] Stops a running container by sending a SIGTERM signal
-docker restart <container>                              # [#docker] Restarts a running or stopped container
-docker rm [-f] <container>                              # [#docker] Deletes a stopped container (`-f`: force remove a running container)
-docker images                                           # [#docker] Lists locally stored Docker images available on the system
-docker rmi <image>                                      # [#docker] Deletes one or more local Docker images
-docker logs [-f] <container>                            # [#docker] Fetches logs from a container (`-f`: follow live log output)
-docker exec -it <container> <command>                   # [#docker] Runs an interactive command (e.g., /bin/bash) inside a running container
-docker build [-t <name>] <dir>                          # [#docker] Builds a Docker image from a Dockerfile in the specified directory
-docker stats [options] [<container>]                    # [#docker] Displays a live stream of container resource usage statistics (CPU, memory, network, I/O)
-docker top <container>                                  # [#docker] Displays the running processes of a container
-docker inspect <container|image>                        # [#docker] Returns low-level information on Docker objects (JSON format)
-docker system df                                        # [#docker] Shows docker disk usage (images, containers, volumes)
-docker system prune [-a]                                # [#docker] Cleans up unused containers, networks, and images (`-a`: remove all unused images)
+docker run [options] <image>                     # [#docker] Creates and starts a new container from a specified Docker image
+docker ps [-a]                                   # [#docker] Lists running containers (`-a`: include stopped containers)
+docker start <container>                         # [#docker] Starts one or more already created containers
+docker stop <container>                          # [#docker] Stops a running container by sending a SIGTERM signal
+docker restart <container>                       # [#docker] Restarts a running or stopped container
+docker rm [-f] <container>                       # [#docker] Deletes a stopped container (`-f`: force remove a running container)
+docker images                                    # [#docker] Lists locally stored Docker images available on the system
+docker rmi <image>                               # [#docker] Deletes one or more local Docker images
+docker logs [-f] <container>                     # [#docker] Fetches logs from a container (`-f`: follow live log output)
+docker exec -it <container> <command>            # [#docker] Runs an interactive command (e.g., /bin/bash) inside a running container
+docker build [-t <name>] <dir>                   # [#docker] Builds a Docker image from a Dockerfile in the specified directory
+docker stats [options] [<container>]             # [#docker] Displays a live stream of container resource usage statistics (CPU, memory, network, I/O)
+docker top <container>                           # [#docker] Displays the running processes of a container
+docker inspect <container|image>                 # [#docker] Returns low-level information on Docker objects (JSON format)
+docker system df                                 # [#docker] Shows docker disk usage (images, containers, volumes)
+docker system prune [-a]                         # [#docker] Cleans up unused containers, networks, and images (`-a`: remove all unused images)
 
 # === DOCKER COMPOSE ===
-docker compose up [-d]                                  # [#docker-compose] Builds, (re)creates, and starts containers defined in a compose file (`-d`: run in background/detached mode)
-docker compose down                                     # [#docker-compose] Stops and removes containers, networks, and default volumes created by up
-docker compose ps                                       # [#docker-compose] Lists containers managed by the current compose project
-docker compose logs [-f]                                # [#docker-compose] Views output logs from compose services (`-f`: follow live output)
-docker compose restart                                  # [#docker-compose] Restarts all or specified services within the compose stack
-docker compose pull                                     # [#docker-compose] Downloads newer versions of the images specified in the compose file
-docker compose stats [options] [service]                # [#docker-compose] Displays live resource usage statistics for compose services
-docker compose top                                      # [#docker-compose] Displays the running processes for compose services
-docker compose events                                   # [#docker-compose] Streams container events from compose services
-docker compose port <service> <port>                    # [#docker-compose] Prints the public port for a port binding tied to a service
+docker compose up [-d]                           # [#docker-compose] Builds, (re)creates, and starts containers defined in a compose file (`-d`: run in background/detached mode)
+docker compose down                              # [#docker-compose] Stops and removes containers, networks, and default volumes created by up
+docker compose ps                                # [#docker-compose] Lists containers managed by the current compose project
+docker compose logs [-f]                         # [#docker-compose] Views output logs from compose services (`-f`: follow live output)
+docker compose restart                           # [#docker-compose] Restarts all or specified services within the compose stack
+docker compose pull                              # [#docker-compose] Downloads newer versions of the images specified in the compose file
+docker compose stats [options] [service]         # [#docker-compose] Displays live resource usage statistics for compose services
+docker compose top                               # [#docker-compose] Displays the running processes for compose services
+docker compose events                            # [#docker-compose] Streams container events from compose services
+docker compose port <service> <port>             # [#docker-compose] Prints the public port for a port binding tied to a service
 
 # === DOCKER TERMINAL TOOLS ===
 lazydocker                                       # [#lazydocker] A TUI dashboard for managing Docker and Docker compose containers, images, and volumes
