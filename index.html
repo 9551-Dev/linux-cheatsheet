@@ -322,6 +322,32 @@
         body.theme_light .token.important,
         body.theme_light .token.variable { color: #953800 !important; background: none !important; }
 
+        ::selection,
+        ::-moz-selection,
+        pre[class*="language-"] ::selection,
+        code[class*="language-"] ::selection,
+        span::selection,
+        .bracket_content::selection,
+        .hash_bracket_content::selection,
+        .token::selection {
+            background-color: #21374b !important;
+            color: #e6edf3 !important;
+            text-shadow: none !important;
+        }
+
+        body.theme_light ::selection,
+        body.theme_light ::-moz-selection,
+        body.theme_light pre[class*="language-"] ::selection,
+        body.theme_light code[class*="language-"] ::selection,
+        body.theme_light span::selection,
+        body.theme_light .bracket_content::selection,
+        body.theme_light .hash_bracket_content::selection,
+        body.theme_light .token::selection {
+            background-color: #c8e1ff !important;
+            color: #1f2328 !important;
+            text-shadow: none !important;
+        }
+
         .token.comment,
         .token.block-comment,
         .token.prolog,
