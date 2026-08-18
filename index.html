@@ -422,7 +422,7 @@
     <div class="header">
         <div class="header_left">
             <div class="header_left">
-                <h1><a href="./cheatsheet.md" class="title_link">9551's Linux Cheatsheet</a></h1>
+                <h1><a href="./cheatsheet.txt" class="title_link">9551's Linux Cheatsheet</a></h1>
                 <span class="subname">(Arch)</span>
             </div>
             <button id="theme_toggle_btn" class="theme_toggle">theme: black</button>
@@ -493,7 +493,7 @@
             }
         }
 
-        fetch_with_retries("cheatsheet.md", 3, 1000)
+        fetch_with_retries("cheatsheet.txt", 3, 1000)
             .then(text => {
                 const code_element = document.getElementById("cheatsheet_code");
                 const raw_lines = text.split("\n");
