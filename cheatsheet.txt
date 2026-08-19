@@ -211,7 +211,7 @@ lsattr <file>                                    # Lists advanced file attribute
 umask [<octal>]                                  # Displays or sets the default file creation permission mask for the current shell session
 
 # === NETWORKING, DNS & SSH ===
-nmtui                                            # Opens an interactive text-based user interface to manage network connections and Wi-Fi
+nmtui                                            # Opens an interactive text-based user interface to manage network connections and wifi
 nmcli device status                              # Displays a tabular list of network interface devices and their current connection states
 ip a                                             # Displays network interface configurations, hardware addresses, and local IP assignments
 ip link [set <dev> <up|down>]                    # Displays Layer 2 MAC status, or enables (up)/disables (down) a specific network interface
