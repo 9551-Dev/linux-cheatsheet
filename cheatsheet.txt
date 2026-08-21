@@ -17,7 +17,7 @@ ln [-s] <target> <link_name>                     # Creates links between files (
 du [-h|-s|-d <num>] [<path>]                     # Estimates disk space usage (`-h`: human readable; `-s`: summary only; append `*` for dir items)
 df -h                                            # Displays filesystem disk space usage summaries in human-readable units
 cat <file>                                       # Outputs the entire contents of a file directly to the standard output stream
-less <file>                                      # Opens a file for interactive, page-by-page viewing (use arrow keys to scroll, "/" to search, press "q" to exit)
+less <file>                                      # [#less] Opens a file for interactive, page-by-page viewing (use arrow keys to scroll, "/" to search, press "q" to exit)
 head [-n <num>] <file>                           # Outputs the first lines of a file (defaults to 10 lines; use `-n` to specify a custom line count)
 tail [-n <num>|-f] <file>                        # Outputs the final lines of a file (`-n`: specify line count; `-f`: append output as the file grows, used for logs)
 grep [-i|-r|-E] <pattern> [<file>]               # Searches for text patterns matching a regular expression (`-i`: case-insensitive; `-r`: recursive directory search; `-E`: extended regular expressions)
@@ -119,7 +119,7 @@ bg [%job]                                        # Resumes a suspended job and r
 fg [%job]                                        # Brings a background or suspended job into the foreground
 <command> &                                      # Runs a command immediately in the background
 nohup <command> &                                # Runs a background command that ignores hangup signals and keeps running after logout
-screen / tmux                                    # [#tmux] Terminal multiplexers for running multiple persistent sessions in one window
+screen / tmux                                    # [#tmux / #screen] Terminal multiplexers for running multiple persistent sessions in one window
 
 # === ALTERNATIVE CLI TOOLS ===
 eza [<dir>]                                      # [#eza] A replacement for ls featuring grid layouts, colors, and git integration
