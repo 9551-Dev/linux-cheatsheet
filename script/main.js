@@ -1,6 +1,7 @@
 import { init_theme_switch }                    from "./theme.js";
 import { fetch_with_retries, update_url_query } from "./lib.js";
 import { init_search }                          from "./search.js";
+import { preprocess_entries }                   from "./preproc.js";
 
 init_theme_switch();
 
@@ -58,34 +59,10 @@ fetch_with_retries("cheatsheet.txt", 3, 1000)
             line_elements.push(span);
         });
 
-        // preprocessing
-        const preprocessed_targets = line_data.map(item => {
-            if (item.is_header || item.is_spacer || !item.text.trim()) {
-                return { norm_target: "", command_part: "", desc_part: "", is_path: false, target_words: [] };
-            }
-
-            const norm_target = item.text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/y/g, "i").replace(/(.)\1{2,}/g, "$1$1");
-            let command_part = norm_target;
-            let desc_part = "";
-            const comment_idx = norm_target.indexOf("#");
-            if (comment_idx !== -1) {
-                command_part = norm_target.slice(0, comment_idx).trim();
-                desc_part = norm_target.slice(comment_idx + 1).replace(/^\[#.*?\]\s*/, "").trim();
-            }
-
-            return {
-                norm_target,
-                command_part,
-                desc_part,
-                is_path: command_part.startsWith("/") || command_part.startsWith("~/") || command_part.startsWith("$"),
-                target_words: norm_target.split(/[\s/._,-]+/).filter(Boolean)
-            };
-        });
-
         // Initialize Search Engine with preprocessed data
         const perform_search = init_search({
             line_data,
-            preprocessed_targets,
+            preprocessed_targets: preprocess_entries(line_data),
             line_elements,
             code_element,
             pre_element: code_element.closest("pre"),

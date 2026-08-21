@@ -1,13 +1,13 @@
 export function init_search({ line_data, preprocessed_targets, line_elements, code_element, pre_element, wrapper_container }) {
     const body_element = document.body;
 
-    function get_match_score(query, targetObj, original_index = -1) {
-        if (!query || !query.trim() || !targetObj.norm_target) return -1000;
+    function get_match_score(query, target_object, original_index = -1) {
+        if (!query || !query.trim() || !target_object.norm_target) return -1000;
 
         const norm_query = query.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/y/g, "i").replace(/(.)\1{2,}/g, "$1$1");
-        if (norm_query === targetObj.norm_target) return 5000;
+        if (norm_query === target_object.norm_target) return 5000;
 
-        const { command_part, desc_part, is_path, target_words, norm_target } = targetObj;
+        const { command_part, desc_part, is_path, target_words, norm_target } = target_object;
         const target_penalty = is_path ? 400 : 0;
         const query_tokens = norm_query.split(/[\s/_-]+/).filter(Boolean);
 
