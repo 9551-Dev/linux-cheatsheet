@@ -48,6 +48,7 @@ xargs [-I {}|-0|-n <num>] <cmd>                  # Converts stdin to cmd args (`
 2>&1                                             # Merges standard error into standard output (e.g., `cmd > file 2>&1`)
 &>> <file>                                       # Appends both standard output and standard error to the bottom of a file
 < <file>                                         # Feeds the contents of a file into a command's standard input (input redirection)
+-                                                # Stream placeholder: tells a command to consume incoming stream data from stdin instead of opening a file on disk (e.g., cat file1 -)
 <<< "<text>"                                     # Here-string: passes a literal string directly into a command's standard input
 << <delimiter>                                   # Here-doc: passes multi-line blocks of text into a command until the delimiter keyword is matched (often EOF)
 tee <file>                                       # Reads from standard input and writes to both standard output and files (use `-a` to append)
@@ -80,6 +81,7 @@ sort [-n|-r] <file>                              # Sorts lines of text files (`-
 uniq [-c] <file>                                 # Reports or omits repeated lines in a file (`-c`: count occurrences; `-d`: only print duplicate lines)
 tr <set1> <set2>                                 # Replaces, squashes, or deletes individual characters from piped input (`-d`: delete chars; `-s`: squash duplicates)
 diff <file1> <file2>                             # Compares files line by line (`-u`: output unified diff format; `-w`: ignore white space)
+paste [-d <delim>|-s] <file>                     # Merges text lines horizontally (`-d`: specify custom delimiter; `-s`: flatten mode, joining all lines from the input into a single row)
 
 # === TERMINAL SHORTCUTS & MOUSE BEHAVIOR ===
 Tab                                              # Auto-completes file, folder, and command names as you type
