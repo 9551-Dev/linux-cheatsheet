@@ -293,6 +293,27 @@ lsmod                                            # Formats and displays a list o
 sudo modprobe <module>                           # Loads a kernel module and its dependencies into the running kernel
 sudo rmmod <module>                              # Removes or unloads a currently active module from the Linux kernel
 
+# === DEBUGGING & DIAGNOSTICS ===
+strace -f -e trace=%file <cmd>                   # [#strace] Traces file-related system calls (`-f`: follow child processes; `%file`: monitor file operations)
+strace -f -e trace=%process <cmd>                # [#strace] Traces process creation and execution (`-f`: follow child processes; `%process`: monitor execve, fork, and clone)
+strace -f -e trace=file -o <log> <cmd>           # [#strace] Saves file-related system calls to a log (`-o`: output file)
+strace -f -e trace=network <cmd>                 # [#strace] Traces network-related system calls
+ltrace -f <cmd>                                  # [#ltrace] Traces shared-library function calls (`-f`: follow child processes)
+gdb <program>                                    # [#gdb] Debugs programs interactively (`run`: start; `bt`: show backtrace; `quit`: exit)
+coredumpctl info <PID>                           # Displays details about a recorded crash and its signal
+pstree -ap                                       # [#pstree] Displays process hierarchy with command-line arguments and PIDs
+timeout <duration> <cmd>                         # Stops a command after a time limit (e.g., `timeout 10s <cmd>`)
+namei -l <path>                                  # Shows every directory and symlink component of a path with permissions
+type -a <cmd>                                    # Lists all shell resolutions for a command, including aliases and functions
+env | sort                                       # Lists environment variables alphabetically
+LD_DEBUG=libs <cmd>                              # Prints dynamic-library loading diagnostics
+QT_DEBUG_PLUGINS=1 <qt_app>                      # Prints Qt plugin discovery and loading diagnostics
+pacman -Qkk <pkg>                                # Checks installed package files against package metadata
+pacman -Qo <path>                                # Identifies which installed package owns a file
+pacman -Ql <pkg>                                 # Lists files installed by a package
+pacman -F <filename>                             # Searches synced package file databases for a filename (`sudo pacman -Fy` refreshes them)
+sha256sum <file>                                 # Calculates a SHA-256 checksum for integrity verification
+
 # === DOCKER & CONTAINERIZATION ===
 docker run [options] <image>                     # [#docker] Creates and starts a new container from a specified Docker image
 docker ps [-a]                                   # [#docker] Lists running containers (`-a`: include stopped containers)
@@ -440,3 +461,25 @@ git stash                                        # [#git] Temporarily shelves un
 /dev/random                                      # Blocking pseudo-random number generator device that waits for entropy pool replenishment
 /dev/full                                        # Special device file that always returns a "No space left on device" error when written to
 /dev/tty                                         # Controlling terminal device file corresponding to the current active login session
+
+# === BINARY ANALYSIS & HARDWARE DIAGNOSTICS ===
+binwalk <file>                                   # [#binwalk] Scans firmware and binary files for embedded filesystems, compressed data, and recognizable file signatures
+strings [-n <num>] <file>                        # Extracts readable text from binaries (`-n`: minimum string length; useful for finding URLs, paths, and embedded messages)
+xxd [-l <num>] <file>                            # Displays a hexadecimal dump of a file (`-l`: limit output to a specified number of bytes)
+hexdump -C <file>                                # Displays file contents as hexadecimal and ASCII with byte offsets (`-C`: canonical format)
+objdump [-d|-h|-t] <file>                        # [#binutils] Inspects executable files and object code (`-d`: disassemble; `-h`: list sections; `-t`: list symbols)
+nm [-C] <file>                                   # [#binutils] Lists symbols in object files and executables (`-C`: demangle C++ symbol names)
+readelf [-h|-S|-s|-l] <file>                     # [#binutils] Inspects ELF executable metadata (`-h`: file header; `-S`: sections; `-s`: symbols; `-l`: program headers)
+lsusb                                            # [#usbutils] Lists connected USB devices and their vendor/product IDs
+lspci -nn                                        # [#pciutils] Lists PCI devices with numeric vendor and device IDs (`-nn`: show names and numeric identifiers)
+udevadm info --query=all --name=<device>         # Displays device properties and metadata (`--query=all`: show available properties; `--name`: specify a device path)
+
+
+# === HARDWARE DEVELOPMENT & EMBEDDED SYSTEMS ===
+minicom -D <device> -b <baud>                    # [#minicom] Serial terminal for UART and embedded-device debugging
+picocom -b <baud> <device>                       # [#picocom] Lightweight serial terminal for device communication
+openocd -f <interface.cfg> -f <target.cfg>       # [#openocd] Debugs and programs microcontrollers via JTAG/SWD
+flashrom -p <programmer>                         # [#flashrom] Identifies supported flash chips and programmers
+esptool --port <device> chip_id                  # [#esptool] Identifies and communicates with ESP8266/ESP32 chips
+sigrok-cli --scan                                # [#sigrok-cli] Detects supported logic analyzers and measurement devices
+pulseview                                        # [#pulseview] GUI for capturing and decoding digital signals with supported hardware
