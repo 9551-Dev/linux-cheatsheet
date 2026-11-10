@@ -428,6 +428,7 @@ git stash                                        # [#git] Temporarily shelves un
 /run/                                            # Runtime data: volatile memory-backed filesystem storing state information since boot
 
 # === USER ACCOUNTS & SECURITY CONFIGURATIONS ===
+faillock [--user <user>] [--reset]               # Displays failed authentication attempts and account lockout status (`--user`: inspect a specific user's failures; `--reset`: resets the lockout counter)
 /etc/shadow                                      # Encrypted password hashes and account expiration details (accessible only by root)
 /etc/group                                       # Group definitions, listing system groups and their associated user members
 /etc/gshadow                                     # Secure group information containing encrypted group passwords
